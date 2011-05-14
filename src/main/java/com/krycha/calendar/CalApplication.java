@@ -17,8 +17,10 @@ public class CalApplication extends Application
         window = new Window("Lab usage application");
         setMainWindow(window);
         MainComponent main = new MainComponent();
+        main.setMainWindow(getMainWindow());
         window.addComponent(main);
         window.getContent().setSizeFull();
+        setTheme("LabCalendar");
         
     }
     
