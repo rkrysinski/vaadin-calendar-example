@@ -129,15 +129,12 @@ public class MainComponent extends CustomComponent {
 	 * This Gregorian calendar is used to control dates and time inside of this
 	 * test application.
 	 */
-	private GregorianCalendar calendar;
 	private Mode viewMode = Mode.WEEK;
 	private static Location DEFAULT_LOC = Location.COLUMBUS;
 	private Window scheduleEventPopup;
 	private final Form scheduleEventForm = new Form();
 	private Button applyEventButton;
 	private Button deleteEventButton;
-
-	private Date currentMonthsFirstDate;
 
 	private Window mainWindow;
 
@@ -164,54 +161,106 @@ public class MainComponent extends CustomComponent {
 			private static final long serialVersionUID = 1L;
 
 			public void buttonClick(ClickEvent event) {
-				switchToMonthView();
+				if (viewMode == Mode.MONTH || viewMode == Mode.DAY) {
+					switchToCurrentWeekView();
+				} else {
+					switchToMonthView();
+				}
+			}
+		});
+
+		nextButton.addListener(new ClickListener() {
+			private static final long serialVersionUID = 1L;
+
+			public void buttonClick(ClickEvent event) {
+				handleNextButtonClick();
+			}
+		});
+
+		prevButton.addListener(new ClickListener() {
+			private static final long serialVersionUID = 1L;
+
+			public void buttonClick(ClickEvent event) {
+				handlePreviousButtonClick();
 			}
 		});
 	}
 
-	/*
-	 * Switch to day view (week view with a single day visible).
-	 */
-	protected void switchToMonthView() {
-		viewMode = Mode.MONTH;
-		calendar.setTime(currentMonthsFirstDate);
-		calendarComponent.setStartDate(currentMonthsFirstDate);
+	private void handlePreviousButtonClick() {
+		switch (viewMode) {
+		case MONTH:
+			previousMonth();
+			break;
+		case WEEK:
+			previousWeek();
+			break;
+		case DAY:
+			previousDay();
+			break;
+		}
 		updateCaptionLabel();
-		calendar.add(GregorianCalendar.MONTH, 1);
-		calendar.add(GregorianCalendar.DATE, -1);
-		resetCalendarTime(true);
 	}
 
-	private void resetCalendarTime(boolean resetEndTime) {
-		resetTime(resetEndTime);
-		if (resetEndTime) {
-			calendarComponent.setEndDate(calendar.getTime());
-		} else {
-			calendarComponent.setStartDate(calendar.getTime());
-			updateCaptionLabel();
+	private void handleNextButtonClick() {
+		switch (viewMode) {
+		case MONTH:
+			nextMonth();
+			break;
+		case WEEK:
+			nextWeek();
+			break;
+		case DAY:
+			nextDay();
+			break;
 		}
+		updateCaptionLabel();
 	}
 
-	/*
-	 * Resets the calendar time (hour, minute second and millisecond) either to
-	 * zero or maximum value.
-	 */
-	private void resetTime(boolean max) {
-		if (max) {
-			calendar.set(GregorianCalendar.HOUR_OF_DAY,
-					calendar.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			calendar.set(GregorianCalendar.MINUTE,
-					calendar.getMaximum(GregorianCalendar.MINUTE));
-			calendar.set(GregorianCalendar.SECOND,
-					calendar.getMaximum(GregorianCalendar.SECOND));
-			calendar.set(GregorianCalendar.MILLISECOND,
-					calendar.getMaximum(GregorianCalendar.MILLISECOND));
-		} else {
-			calendar.set(GregorianCalendar.HOUR_OF_DAY, 0);
-			calendar.set(GregorianCalendar.MINUTE, 0);
-			calendar.set(GregorianCalendar.SECOND, 0);
-			calendar.set(GregorianCalendar.MILLISECOND, 0);
-		}
+	private void nextMonth() {
+		calendarComponent.rollMonth(1);
+	}
+
+	private void previousMonth() {
+		calendarComponent.rollMonth(-1);
+	}
+
+	private void nextWeek() {
+		calendarComponent.rollWeek(1);
+	}
+
+	private void previousWeek() {
+		calendarComponent.rollWeek(-1);
+	}
+
+	private void nextDay() {
+		calendarComponent.rollDate(1);
+	}
+
+	private void previousDay() {
+		calendarComponent.rollDate(-1);
+	}
+
+	protected void switchToMonthView() {
+		monthViewButton.setCaption("Week view");
+		viewMode = Mode.MONTH;
+		calendarComponent.switchToMonthView();
+		updateCaptionLabel();
+	}
+
+	protected void switchToWeekView() {
+		monthViewButton.setCaption("Month view");
+		viewMode = Mode.WEEK;
+		updateCaptionLabel();
+	}
+
+	protected void switchToCurrentWeekView() {
+		calendarComponent.switchToCurrentWeekView();
+		switchToWeekView();
+	}
+
+	protected void switchToDayView() {
+		monthViewButton.setCaption("Week view");
+		viewMode = Mode.DAY;
 	}
 
 	private void initializeCalendar() {
@@ -219,20 +268,11 @@ public class MainComponent extends CustomComponent {
 		calendarComponent.setLocale(getLocale());
 		calendarComponent.setTimeZone(TimeZone.getTimeZone((String) DEFAULT_LOC
 				.getTimezone()));
-
-		Date today = new Date();
-		calendar = new GregorianCalendar(getLocale());
-		calendar.setTime(today);
+		calendarComponent.init(getLocale());
 
 		updateCaptionLabel();
 
 		addCalendarEventListeners();
-
-		// calculate current month first date
-		GregorianCalendar calendarTmp = new GregorianCalendar(getLocale());
-		int rollAmount = calendarTmp.get(GregorianCalendar.DAY_OF_MONTH) - 1;
-		calendarTmp.add(GregorianCalendar.DAY_OF_MONTH, -rollAmount);
-		currentMonthsFirstDate = calendarTmp.getTime();
 	}
 
 	@SuppressWarnings("serial")
@@ -244,8 +284,8 @@ public class MainComponent extends CustomComponent {
 				// let BasicWeekClickHandler handle calendar dates, and update
 				// only the other parts of UI here
 				super.weekClick(event);
-				updateCaptionLabel();
-				viewMode = Mode.WEEK;
+				calendarComponent.setWeek(event.getWeek(), event.getYear());
+				switchToWeekView();
 			}
 		});
 
@@ -258,9 +298,8 @@ public class MainComponent extends CustomComponent {
 		calendarComponent.setHandler(new BasicDateClickHandler() {
 			@Override
 			public void dateClick(DateClickEvent event) {
-				// let BasicDateClickHandler handle calendar dates, and update
-				// only the other parts of UI here
 				super.dateClick(event);
+				calendarComponent.setTime(event.getDate());
 				switchToDayView();
 			}
 		});
@@ -281,7 +320,7 @@ public class MainComponent extends CustomComponent {
 		 * the end of the last day.
 		 */
 		if (event.isMonthlyMode()) {
-			end = Calendar.getEndOfDay(calendar, end);
+			end = Calendar.getEndOfDay(calendarComponent.getCal(), end);
 		}
 
 		showEventPopup(createNewEvent(start, end), true);
@@ -294,10 +333,6 @@ public class MainComponent extends CustomComponent {
 		event.setEnd(endDate);
 		event.setStyleName("color1");
 		return event;
-	}
-
-	protected void switchToDayView() {
-		viewMode = Mode.DAY;
 	}
 
 	private void showEventPopup(CalendarEvent event, boolean newEvent) {
@@ -527,18 +562,12 @@ public class MainComponent extends CustomComponent {
 		return (BasicEvent) event;
 	}
 
-	protected void switchToCurrentWeekView() {
-		viewMode = Mode.WEEK;
-		updateCaptionLabel();
-		WeekClick event = new WeekClick(calendarComponent, calendar.get(GregorianCalendar.WEEK_OF_YEAR),  calendar.get(GregorianCalendar.YEAR));
-		BasicWeekClickHandler weekHandler = (BasicWeekClickHandler) calendarComponent.getHandler(WeekClick.EVENT_ID);
-		weekHandler.weekClick(event);
-	}
-
 	private void updateCaptionLabel() {
 		DateFormatSymbols s = new DateFormatSymbols(getLocale());
-		String month = s.getShortMonths()[calendar.get(GregorianCalendar.MONTH)];
-		monthLabel.setValue(month + " " + calendar.get(GregorianCalendar.YEAR));
+		String month = s.getShortMonths()[calendarComponent.getCal().get(
+				GregorianCalendar.MONTH)];
+		monthLabel.setValue(month + " "
+				+ calendarComponent.getCal().get(GregorianCalendar.YEAR));
 	}
 
 	private void initializeComboBoxs() {
@@ -607,6 +636,8 @@ public class MainComponent extends CustomComponent {
 
 		// remember the week that was showing, so we can re-set it later
 		Date startDate = calendarComponent.getStartDate();
+		
+		GregorianCalendar calendar = calendarComponent.getCal();
 		calendar.setTime(startDate);
 		int weekNumber = calendar.get(java.util.Calendar.WEEK_OF_YEAR);
 		calendarComponent.setTimeZone(tz);
@@ -645,6 +676,7 @@ public class MainComponent extends CustomComponent {
 	}
 
 	protected void updateCalendarLocale(Locale l) {
+		GregorianCalendar calendar = calendarComponent.getCal();
 		int oldFirstDayOfWeek = calendar.getFirstDayOfWeek();
 		setLocale(l);
 		calendarComponent.setLocale(l);
