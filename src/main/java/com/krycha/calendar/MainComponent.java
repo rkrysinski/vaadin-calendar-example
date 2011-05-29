@@ -786,8 +786,8 @@ public class MainComponent extends CustomComponent {
 		Date startDate = calendarComponent.getStartDate();
 
 		GregorianCalendar calendar = calendarComponent.getCal();
-		calendar.setTime(startDate);
 		int weekNumber = calendar.get(java.util.Calendar.WEEK_OF_YEAR);
+		calendar.setTime(startDate);
 		calendarComponent.setTimeZone(tz);
 		calendar.setTimeZone(calendarComponent.getTimeZone());
 
@@ -823,10 +823,10 @@ public class MainComponent extends CustomComponent {
 	}
 
 	protected void updateCalendarLocale(Locale l) {
+		calendarComponent.setLocale(l);
 		GregorianCalendar calendar = calendarComponent.getCal();
 		int oldFirstDayOfWeek = calendar.getFirstDayOfWeek();
 		setLocale(l);
-		calendarComponent.setLocale(l);
 		calendar = new GregorianCalendar(l);
 		int newFirstDayOfWeek = calendar.getFirstDayOfWeek();
 

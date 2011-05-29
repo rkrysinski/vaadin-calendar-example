@@ -43,15 +43,24 @@ public class CalComponent extends Calendar {
 		calendarTmp.add(GregorianCalendar.DAY_OF_MONTH, -rollAmount);
 		currentMonthsFirstDate = calendarTmp.getTime();
 
+		initializeCalendar(locale);
+
+	}
+	
+	private void initializeCalendar(Locale locale) {
 		Date today = new Date();
 		calendar = new GregorianCalendar(locale);
 		calendar.setTime(today);
 
 		currentWeekDate = today;
-		currentWeekEvent = new WeekClick(this,
-				calendar.get(GregorianCalendar.WEEK_OF_YEAR),
+		currentWeekEvent = new WeekClick(this, calendar.get(GregorianCalendar.WEEK_OF_YEAR),
 				calendar.get(GregorianCalendar.YEAR));
+	}
 
+	@Override
+	public void setLocale(Locale newLocale) {
+		initializeCalendar(newLocale);
+		super.setLocale(newLocale);
 	}
 
 	public CalEventProvider getDataSource() {
@@ -97,8 +106,7 @@ public class CalComponent extends Calendar {
 	public void rollWeek(int direction) {
 		calendar.add(GregorianCalendar.WEEK_OF_YEAR, direction);
 
-		WeekClick weekEvent = new WeekClick(this,
-				calendar.get(GregorianCalendar.WEEK_OF_YEAR),
+		WeekClick weekEvent = new WeekClick(this, calendar.get(GregorianCalendar.WEEK_OF_YEAR),
 				calendar.get(GregorianCalendar.YEAR));
 
 		BasicWeekClickHandler weekHandler = (BasicWeekClickHandler) this
@@ -134,10 +142,8 @@ public class CalComponent extends Calendar {
 	private void skaleToMax() {
 		calendar.set(GregorianCalendar.HOUR_OF_DAY,
 				calendar.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-		calendar.set(GregorianCalendar.MINUTE,
-				calendar.getMaximum(GregorianCalendar.MINUTE));
-		calendar.set(GregorianCalendar.SECOND,
-				calendar.getMaximum(GregorianCalendar.SECOND));
+		calendar.set(GregorianCalendar.MINUTE, calendar.getMaximum(GregorianCalendar.MINUTE));
+		calendar.set(GregorianCalendar.SECOND, calendar.getMaximum(GregorianCalendar.SECOND));
 		calendar.set(GregorianCalendar.MILLISECOND,
 				calendar.getMaximum(GregorianCalendar.MILLISECOND));
 	}
