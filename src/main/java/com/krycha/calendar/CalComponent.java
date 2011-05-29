@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import com.vaadin.addon.calendar.event.BasicEvent;
 import com.vaadin.addon.calendar.ui.Calendar;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.DateClickEvent;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.WeekClick;
@@ -22,6 +23,18 @@ public class CalComponent extends Calendar {
 	public CalComponent() {
 		super(eventProvider);
 
+	}
+
+	public void addEvent(BasicEvent event) {
+		eventProvider.addEvent(event);
+	}
+
+	public void removeEvent(BasicEvent event) {
+		eventProvider.removeEvent(event);
+	}
+
+	public boolean containsEvent(BasicEvent event) {
+		return eventProvider.containsEvent(event);
 	}
 
 	public void init(Locale locale) {
@@ -71,7 +84,7 @@ public class CalComponent extends Calendar {
 			calendar.add(GregorianCalendar.DATE, -1);
 			doSetEndDate();
 		} else {
-			calendar.add(GregorianCalendar.MONTH, direction*2);
+			calendar.add(GregorianCalendar.MONTH, direction * 2);
 			calendar.add(GregorianCalendar.DATE, 1);
 			doSetStartDate();
 			calendar.add(GregorianCalendar.MONTH, 1);

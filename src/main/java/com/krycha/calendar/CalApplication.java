@@ -14,7 +14,7 @@ public class CalApplication extends Application
     @Override
     public void init()
     {
-        window = new Window("Lab usage application");
+    	window = new Window("Lab usage application");
         setMainWindow(window);
         MainComponent main = new MainComponent();
         main.setMainWindow(getMainWindow());
