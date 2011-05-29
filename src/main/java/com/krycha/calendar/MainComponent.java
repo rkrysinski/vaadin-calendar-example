@@ -718,7 +718,9 @@ public class MainComponent extends CustomComponent {
 	}
 
 	protected void updateLab(Object value) {
-		System.out.println("updateLab: " + (String) value);
+		if (value != null) {
+			System.out.println("updateLab: " + (String) value);
+		}
 
 	}
 
