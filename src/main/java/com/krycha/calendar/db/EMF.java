@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -51,6 +52,8 @@ public final class EMF {
 				}
 			}
 			retValue = (T) q.getSingleResult();
+		} catch (NoResultException e) {
+			// fall through, return null
 		} finally {
 			em.getTransaction().commit();
 			em.close();
@@ -84,6 +87,29 @@ public final class EMF {
 					em.merge(obj);
 				}
 			}
+		} finally {
+			em.getTransaction().commit();
+			em.close();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends DbPojo> void remove(Class<T> c, String query, Map<String, Object> parameters) {
+		EntityManager em = get();
+		em.getTransaction().begin();
+		try {
+			Query q = em.createQuery(query);
+			if (parameters != null) {
+				for (String key : parameters.keySet()) {
+					q.setParameter(key, parameters.get(key));
+				}
+			}
+			T toRemove = (T) q.getSingleResult();
+			System.out.println("remove: " + toRemove.toString());
+			em.remove(toRemove);
+		} catch (NoResultException e) {
+			// fall through, return null
+			System.out.println("remove: " + e.getMessage());
 		} finally {
 			em.getTransaction().commit();
 			em.close();

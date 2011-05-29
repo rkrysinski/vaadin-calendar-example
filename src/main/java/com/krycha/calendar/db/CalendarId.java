@@ -12,7 +12,7 @@ import javax.persistence.Transient;
 public class CalendarId extends DbPojo implements Serializable {
 	@Transient
 	private static final long serialVersionUID = -4613303344120359911L;
-	
+
 	private String description;
 
 	@OneToMany(mappedBy = "calendarId")
@@ -34,10 +34,20 @@ public class CalendarId extends DbPojo implements Serializable {
 	}
 
 	/**
-	 * @return the members
+	 * @return the events
 	 */
-	public List<CalendarEvent> getMembers() {
+	public List<CalendarEvent> getEvents() {
 		return events;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "CalendarId: Id:" + this.getId() + " description:" + this.getDescription();
 	}
 
 }
