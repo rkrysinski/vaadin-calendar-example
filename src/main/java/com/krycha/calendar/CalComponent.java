@@ -30,14 +30,12 @@ public class CalComponent extends Calendar {
 	public void addEvent(BasicCalendarEvent event) {
 		eventProvider.addEvent(event);
 		event.setCalendarId(eventProvider);
-		EMF.store(event);
 		EMF.store(eventProvider);
 	}
 
 	public void removeEvent(BasicCalendarEvent event) {
 		eventProvider.removeEvent(event);
 		event.setCalendarId(eventProvider);
-		EMF.store(event);
 		EMF.store(eventProvider);
 	}
 

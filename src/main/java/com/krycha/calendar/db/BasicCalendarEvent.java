@@ -1,9 +1,7 @@
 package com.krycha.calendar.db;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -21,14 +19,14 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 	private String caption;
 	private String description;
 	@Column(name = "END_DATE")
-	@Temporal(TemporalType.TIME)
-	private Calendar end = new GregorianCalendar();
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date end;
 	@Column(name = "START_DATE")
-	@Temporal(TemporalType.TIME)
-	private Calendar start = new GregorianCalendar();
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date start;
 	private String styleName;
 	private boolean isAllDay;
-	//@ManyToOne
+	// @ManyToOne
 	private CalEventProvider calendarId;
 
 	@Transient
@@ -49,11 +47,11 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 	}
 
 	public Date getEnd() {
-		return end.getTime();
+		return end;
 	}
 
 	public Date getStart() {
-		return start.getTime();
+		return start;
 	}
 
 	public String getStyleName() {
@@ -75,12 +73,12 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 	}
 
 	public void setEnd(Date end) {
-		this.end.setTime(end);
+		this.end = end;
 		fireEventChange();
 	}
 
 	public void setStart(Date start) {
-		this.start.setTime(start);
+		this.start = start;
 		fireEventChange();
 	}
 
