@@ -27,6 +27,13 @@ public class CalEventProvider implements CalendarEventProvider, EventSetChangeNo
 	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy = "calendarId")
 	protected List<BasicCalendarEvent> eventList = new ArrayList<BasicCalendarEvent>();
 	
+	/**
+	 * @return the eventList
+	 */
+	public List<BasicCalendarEvent> getEventList() {
+		return eventList;
+	}
+
 	@Transient
 	private static final long serialVersionUID = 630145351104741918L;
 	@Transient

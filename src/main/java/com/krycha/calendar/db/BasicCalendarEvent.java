@@ -1,11 +1,13 @@
 package com.krycha.calendar.db;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -18,10 +20,12 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 
 	private String caption;
 	private String description;
-	@Temporal(TemporalType.DATE)
-	private Date end;
-	@Temporal(TemporalType.DATE)
-	private Date start;
+	@Column(name = "END_DATE")
+	@Temporal(TemporalType.TIME)
+	private Calendar end = new GregorianCalendar();
+	@Column(name = "START_DATE")
+	@Temporal(TemporalType.TIME)
+	private Calendar start = new GregorianCalendar();
 	private String styleName;
 	private boolean isAllDay;
 	//@ManyToOne
@@ -36,47 +40,22 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.vaadin.addon.calendar.event.CalendarEvent#getCaption()
-	 */
 	public String getCaption() {
 		return caption;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.vaadin.addon.calendar.event.CalendarEvent#getDescription()
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.vaadin.addon.calendar.event.CalendarEvent#getEnd()
-	 */
 	public Date getEnd() {
-		return end;
+		return end.getTime();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.vaadin.addon.calendar.event.CalendarEvent#getStart()
-	 */
 	public Date getStart() {
-		return start;
+		return start.getTime();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.vaadin.addon.calendar.event.CalendarEvent#getStyleName()
-	 */
 	public String getStyleName() {
 		return styleName;
 	}
@@ -84,8 +63,6 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 	public boolean isAllDay() {
 		return isAllDay;
 	}
-
-	// setters for properties
 
 	public void setCaption(String caption) {
 		this.caption = caption;
@@ -98,12 +75,12 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 	}
 
 	public void setEnd(Date end) {
-		this.end = end;
+		this.end.setTime(end);
 		fireEventChange();
 	}
 
 	public void setStart(Date start) {
-		this.start = start;
+		this.start.setTime(start);
 		fireEventChange();
 	}
 
@@ -117,29 +94,11 @@ public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, E
 		fireEventChange();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventChangeNotifier
-	 * #addListener
-	 * (com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventChangeListener
-	 * )
-	 */
 	public void addListener(EventChangeListener listener) {
 		listeners.add(listener);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventChangeNotifier
-	 * #removeListener
-	 * (com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventChangeListener
-	 * )
-	 */
 	public void removeListener(EventChangeListener listener) {
 		listeners.remove(listener);
 	}

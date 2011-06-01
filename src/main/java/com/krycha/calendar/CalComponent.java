@@ -31,12 +31,14 @@ public class CalComponent extends Calendar {
 		eventProvider.addEvent(event);
 		event.setCalendarId(eventProvider);
 		EMF.store(event);
+		EMF.store(eventProvider);
 	}
 
 	public void removeEvent(BasicCalendarEvent event) {
 		eventProvider.removeEvent(event);
 		event.setCalendarId(eventProvider);
 		EMF.store(event);
+		EMF.store(eventProvider);
 	}
 
 	public boolean containsEvent(BasicCalendarEvent event) {
@@ -172,5 +174,11 @@ public class CalComponent extends Calendar {
 
 	public void swithToLab(String value) {
 		eventProvider = EMF.find(CalEventProvider.class, value);
+		System.out.println("eventProvider size: " + eventProvider.getEventList().size());
+		for (BasicCalendarEvent event : eventProvider.getEventList()) {
+			System.out.println("event: " + event.getDescription());
+		}
+		setEventProvider(eventProvider);
+		eventProvider.eventChange(null);
 	}
 }

@@ -76,20 +76,20 @@ public final class EMF {
 		return retValue;
 	}
 
-	public static <T extends DbPojo> void store(T obj) {
-		EntityManager em = get();
-		em.getTransaction().begin();
-		try {
-			if (obj.getId() == null) {
-				em.persist(obj);
-			} else {
-				em.merge(obj);
-			}
-		} finally {
-			em.getTransaction().commit();
-			em.close();
-		}
-	}
+//	public static <T extends DbPojo> void store(T obj) {
+//		EntityManager em = get();
+//		em.getTransaction().begin();
+//		try {
+//			if (obj.getId() == null) {
+//				em.persist(obj);
+//			} else {
+//				em.merge(obj);
+//			}
+//		} finally {
+//			em.getTransaction().commit();
+//			em.close();
+//		}
+//	}
 	
 	public static <T> void store(T obj) {
 		EntityManager em = get();
