@@ -6,8 +6,8 @@
 		<provider>
 			org.eclipse.persistence.jpa.PersistenceProvider
 		</provider>
-		<class>com.krycha.calendar.db.CalendarEvent</class>
-		<class>com.krycha.calendar.db.CalendarId</class>
+		<class>com.krycha.calendar.db.BasicCalendarEvent</class>
+		<class>com.krycha.calendar.db.CalEventProvider</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
 			<property name="javax.persistence.jdbc.url"

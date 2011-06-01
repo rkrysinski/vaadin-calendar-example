@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import com.vaadin.addon.calendar.event.BasicEvent;
+import com.krycha.calendar.db.BasicCalendarEvent;
+import com.krycha.calendar.db.CalEventProvider;
+import com.krycha.calendar.db.EMF;
 import com.vaadin.addon.calendar.ui.Calendar;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.DateClickEvent;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.WeekClick;
@@ -14,7 +16,7 @@ import com.vaadin.addon.calendar.ui.handler.BasicWeekClickHandler;
 public class CalComponent extends Calendar {
 
 	private static final long serialVersionUID = 2310975067647618615L;
-	private static final CalEventProvider eventProvider = new CalEventProvider();
+	private static CalEventProvider eventProvider = new CalEventProvider();
 	private Date currentMonthsFirstDate;
 	private GregorianCalendar calendar;
 	private WeekClick currentWeekEvent;
@@ -25,15 +27,19 @@ public class CalComponent extends Calendar {
 
 	}
 
-	public void addEvent(BasicEvent event) {
+	public void addEvent(BasicCalendarEvent event) {
 		eventProvider.addEvent(event);
+		event.setCalendarId(eventProvider);
+		EMF.store(event);
 	}
 
-	public void removeEvent(BasicEvent event) {
+	public void removeEvent(BasicCalendarEvent event) {
 		eventProvider.removeEvent(event);
+		event.setCalendarId(eventProvider);
+		EMF.store(event);
 	}
 
-	public boolean containsEvent(BasicEvent event) {
+	public boolean containsEvent(BasicCalendarEvent event) {
 		return eventProvider.containsEvent(event);
 	}
 
@@ -46,7 +52,7 @@ public class CalComponent extends Calendar {
 		initializeCalendar(locale);
 
 	}
-	
+
 	private void initializeCalendar(Locale locale) {
 		Date today = new Date();
 		calendar = new GregorianCalendar(locale);
@@ -61,10 +67,6 @@ public class CalComponent extends Calendar {
 	public void setLocale(Locale newLocale) {
 		initializeCalendar(newLocale);
 		super.setLocale(newLocale);
-	}
-
-	public CalEventProvider getDataSource() {
-		return eventProvider;
 	}
 
 	public void switchToMonthView() {
@@ -166,5 +168,9 @@ public class CalComponent extends Calendar {
 	public void setWeek(int week, int year) {
 		calendar.set(GregorianCalendar.WEEK_OF_YEAR, week);
 		calendar.set(GregorianCalendar.YEAR, year);
+	}
+
+	public void swithToLab(String value) {
+		eventProvider = EMF.find(CalEventProvider.class, value);
 	}
 }

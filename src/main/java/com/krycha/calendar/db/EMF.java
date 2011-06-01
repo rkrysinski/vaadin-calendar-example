@@ -25,7 +25,7 @@ public final class EMF {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends DbPojo> List<T> findAll(Class<T> c) {
+	public static <T> List<T> findAll(Class<T> c) {
 		List<T> retList = null;
 		EntityManager em = get();
 		em.getTransaction().begin();
@@ -33,7 +33,7 @@ public final class EMF {
 			Query q = em.createQuery("select f from " + c.getSimpleName() + " f");
 			retList = (List<T>) q.getResultList();
 		} finally {
-			em.getTransaction().commit();
+			em.getTransaction().rollback();
 			em.close();
 		}
 		return retList;
@@ -60,6 +60,21 @@ public final class EMF {
 		}
 		return retValue;
 	}
+	
+	public static <T> T find(Class<T> c, Object id) {
+		T retValue = null;
+		EntityManager em = get();
+		em.getTransaction().begin();
+		try {
+			retValue = (T) em.find(c, id);
+		} catch (NoResultException e) {
+			// fall through, return null
+		} finally {
+			em.getTransaction().commit();
+			em.close();
+		}
+		return retValue;
+	}
 
 	public static <T extends DbPojo> void store(T obj) {
 		EntityManager em = get();
@@ -70,6 +85,17 @@ public final class EMF {
 			} else {
 				em.merge(obj);
 			}
+		} finally {
+			em.getTransaction().commit();
+			em.close();
+		}
+	}
+	
+	public static <T> void store(T obj) {
+		EntityManager em = get();
+		em.getTransaction().begin();
+		try {
+			em.merge(obj);
 		} finally {
 			em.getTransaction().commit();
 			em.close();
@@ -105,6 +131,22 @@ public final class EMF {
 				}
 			}
 			T toRemove = (T) q.getSingleResult();
+			System.out.println("remove: " + toRemove.toString());
+			em.remove(toRemove);
+		} catch (NoResultException e) {
+			// fall through, return null
+			System.out.println("remove: " + e.getMessage());
+		} finally {
+			em.getTransaction().commit();
+			em.close();
+		}
+	}
+	
+	public static <T> void remove(Class<T> c, Object id) {
+		EntityManager em = get();
+		em.getTransaction().begin();
+		try {
+			T toRemove = (T) em.find(c, id);
 			System.out.println("remove: " + toRemove.toString());
 			em.remove(toRemove);
 		} catch (NoResultException e) {

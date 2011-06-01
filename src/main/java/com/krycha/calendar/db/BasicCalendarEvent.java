@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -13,9 +14,7 @@ import com.vaadin.addon.calendar.event.CalendarEvent.EventChangeNotifier;
 import com.vaadin.addon.calendar.event.CalendarEventEditor;
 
 @Entity
-public class CalendarEvent extends DbPojo implements CalendarEventEditor, EventChangeNotifier {
-	@Transient
-	private static final long serialVersionUID = 2207135337270065699L;
+public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, EventChangeNotifier {
 
 	private String caption;
 	private String description;
@@ -25,11 +24,17 @@ public class CalendarEvent extends DbPojo implements CalendarEventEditor, EventC
 	private Date start;
 	private String styleName;
 	private boolean isAllDay;
-
-	private CalendarId calendarId;
+	//@ManyToOne
+	private CalEventProvider calendarId;
 
 	@Transient
+	private static final long serialVersionUID = 2207135337270065699L;
+	@Transient
 	private List<EventChangeListener> listeners = new ArrayList<EventChangeListener>();
+
+	public BasicCalendarEvent() {
+
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -151,14 +156,14 @@ public class CalendarEvent extends DbPojo implements CalendarEventEditor, EventC
 	 * @param calendarId
 	 *            the calendarId to set
 	 */
-	public void setCalendarId(CalendarId calendarId) {
+	public void setCalendarId(CalEventProvider calendarId) {
 		this.calendarId = calendarId;
 	}
 
 	/**
 	 * @return the calendarId
 	 */
-	public CalendarId getCalendarId() {
+	public CalEventProvider getCalendarId() {
 		return calendarId;
 	}
 }

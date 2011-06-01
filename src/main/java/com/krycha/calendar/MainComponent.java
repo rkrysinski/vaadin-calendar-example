@@ -11,9 +11,9 @@ import java.util.TimeZone;
 
 import org.vaadin.dialogs.ConfirmDialog;
 
-import com.krycha.calendar.db.CalendarId;
+import com.krycha.calendar.db.BasicCalendarEvent;
+import com.krycha.calendar.db.CalEventProvider;
 import com.krycha.calendar.db.EMF;
-import com.vaadin.addon.calendar.event.BasicEvent;
 import com.vaadin.addon.calendar.event.CalendarEvent;
 import com.vaadin.addon.calendar.ui.Calendar;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.DateClickEvent;
@@ -266,9 +266,9 @@ public class MainComponent extends CustomComponent {
 	}
 
 	protected String refreshLabBox() {
-		List<CalendarId> list = EMF.findAll(CalendarId.class);
+		List<CalEventProvider> list = EMF.findAll(CalEventProvider.class);
 		labBox.removeAllItems();
-		for (CalendarId id : list) {
+		for (CalEventProvider id : list) {
 			if (!labBox.containsId(id.getDescription())) {
 				Item i = labBox.addItem(id.getDescription());
 				i.getItemProperty("caption").setValue(id.getDescription());
@@ -283,23 +283,29 @@ public class MainComponent extends CustomComponent {
 
 	protected void dbRemoveLab(String value) {
 		if (value != null) {
-			Map<String, Object> parameters = new HashMap<String, Object>();
-			parameters.put("description", value);
-			EMF.remove(CalendarId.class,
-					"SELECT u FROM CalendarId AS u WHERE u.description=:description", parameters);
+			EMF.remove(CalEventProvider.class, value);
 		} else {
 			System.out.println("dbRemoveLab");
 		}
 
 	}
 
+	protected CalEventProvider dbGetLab() {
+		String lab = (String) addLabInput.getValue();
+		if (lab == null || lab.length() == 0) {
+			return null;
+		}
+		CalEventProvider entry = EMF.find(CalEventProvider.class, lab);
+
+		return entry;
+	}
+
 	protected void dbAddLab(String inputValue) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("description", inputValue);
-		CalendarId entry = EMF.find(CalendarId.class,
-				"SELECT u FROM CalendarId AS u WHERE u.description=:description", parameters);
+		CalEventProvider entry = EMF.find(CalEventProvider.class, inputValue);
 		if (entry == null) {
-			CalendarId cal = new CalendarId();
+			CalEventProvider cal = new CalEventProvider();
 			cal.setDescription(inputValue);
 			EMF.store(cal);
 			getWindow().showNotification("Successfully added \"" + inputValue + "\" lab.");
@@ -449,16 +455,21 @@ public class MainComponent extends CustomComponent {
 	}
 
 	private CalendarEvent createNewEvent(Date startDate, Date endDate) {
-		BasicEvent event = new BasicEvent();
+		BasicCalendarEvent event = new BasicCalendarEvent();
 		event.setCaption("");
 		event.setStart(startDate);
 		event.setEnd(endDate);
 		event.setStyleName("color1");
+		event.setCalendarId(dbGetLab());
 		return event;
 	}
 
 	private void showEventPopup(CalendarEvent event, boolean newEvent) {
 		if (event == null) {
+			return;
+		}
+		if (labBox.getValue() == null || ((String) labBox.getValue()).length() == 0) {
+			getWindow().showNotification("Please celect lab.", "", Notification.TYPE_ERROR_MESSAGE);
 			return;
 		}
 
@@ -653,7 +664,7 @@ public class MainComponent extends CustomComponent {
 
 	/* Removes the event from the data source and fires change event. */
 	private void deleteCalendarEvent() {
-		BasicEvent event = getFormCalendarEvent();
+		BasicCalendarEvent event = getFormCalendarEvent();
 		if (calendarComponent.containsEvent(event)) {
 			calendarComponent.removeEvent(event);
 		}
@@ -663,7 +674,7 @@ public class MainComponent extends CustomComponent {
 	/* Adds/updates the event in the data source and fires change event. */
 	private void commitCalendarEvent() {
 		scheduleEventForm.commit();
-		BasicEvent event = getFormCalendarEvent();
+		BasicCalendarEvent event = getFormCalendarEvent();
 		if (!calendarComponent.containsEvent(event)) {
 			calendarComponent.addEvent(event);
 		}
@@ -671,11 +682,11 @@ public class MainComponent extends CustomComponent {
 	}
 
 	@SuppressWarnings("unchecked")
-	private BasicEvent getFormCalendarEvent() {
+	private BasicCalendarEvent getFormCalendarEvent() {
 		BeanItem<CalendarEvent> item = (BeanItem<CalendarEvent>) scheduleEventForm
 				.getItemDataSource();
 		CalendarEvent event = item.getBean();
-		return (BasicEvent) event;
+		return (BasicCalendarEvent) event;
 	}
 
 	private void updateCaptionLabel() {
@@ -696,8 +707,8 @@ public class MainComponent extends CustomComponent {
 		labBox.setItemCaptionPropertyId("caption");
 		labBox.setFilteringMode(ComboBox.FILTERINGMODE_CONTAINS);
 
-		List<CalendarId> list = EMF.findAll(CalendarId.class);
-		for (CalendarId id : list) {
+		List<CalEventProvider> list = EMF.findAll(CalEventProvider.class);
+		for (CalEventProvider id : list) {
 			if (!labBox.containsId(id.getDescription())) {
 				Item i = labBox.addItem(id.getDescription());
 				i.getItemProperty("caption").setValue(id.getDescription());
@@ -705,7 +716,9 @@ public class MainComponent extends CustomComponent {
 		}
 
 		if (list.size() != 0) {
-			labBox.select(list.iterator().next().getDescription());
+			String value = list.iterator().next().getDescription();
+			labBox.select(value);
+			calendarComponent.swithToLab(value);
 		}
 		labBox.setImmediate(true);
 		labBox.addListener(new ValueChangeListener() {
@@ -720,6 +733,7 @@ public class MainComponent extends CustomComponent {
 	protected void updateLab(Object value) {
 		if (value != null) {
 			System.out.println("updateLab: " + (String) value);
+			calendarComponent.swithToLab((String)value);
 		}
 
 	}
