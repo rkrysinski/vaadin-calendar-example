@@ -15,10 +15,15 @@ import com.krycha.calendar.db.BasicCalendarEvent;
 import com.krycha.calendar.db.CalEventProvider;
 import com.krycha.calendar.db.EMF;
 import com.vaadin.addon.calendar.event.CalendarEvent;
+import com.vaadin.addon.calendar.event.CalendarEventEditor;
 import com.vaadin.addon.calendar.ui.Calendar;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.DateClickEvent;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventClick;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventClickHandler;
+import com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventMoveHandler;
+import com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventResize;
+import com.vaadin.addon.calendar.ui.CalendarComponentEvents.EventResizeHandler;
+import com.vaadin.addon.calendar.ui.CalendarComponentEvents.MoveEvent;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.RangeSelectEvent;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.RangeSelectHandler;
 import com.vaadin.addon.calendar.ui.CalendarComponentEvents.WeekClick;
@@ -433,8 +438,54 @@ public class MainComponent extends CustomComponent {
 		});
 
 		calendarComponent.setHandler(new RangeSelectHandler() {
+			@Override
 			public void rangeSelect(RangeSelectEvent event) {
 				handleRangeSelect(event);
+			}
+		});
+
+		calendarComponent.setHandler(new EventMoveHandler() {
+
+			@Override
+			public void eventMove(MoveEvent event) {
+				CalendarEvent calendarEvent = event.getCalendarEvent();
+				if (calendarEvent instanceof CalEventEditor) {
+					CalEventEditor editableEvent = (CalEventEditor) calendarEvent;
+					Date newFromTime = event.getNewStart();
+					// Update event dates
+					long length = editableEvent.getEnd().getTime()
+							- editableEvent.getStart().getTime();
+					setDates(editableEvent, newFromTime, new Date(newFromTime.getTime() + length));
+					System.out.println("EventMoveHandler: " + editableEvent.toString());
+					calendarComponent.addEvent((BasicCalendarEvent) editableEvent);
+				} else {
+					System.out.println("something wrong...");
+				}
+			}
+
+			protected void setDates(CalEventEditor event, Date start, Date end) {
+				event.setStart(start);
+				event.setEnd(end);
+			}
+		});
+
+		calendarComponent.setHandler(new EventResizeHandler() {
+			public void eventResize(EventResize event) {
+				CalendarEvent calendarEvent = event.getCalendarEvent();
+
+				if (calendarEvent instanceof CalEventEditor) {
+					Date newStartTime = event.getNewStartTime();
+					Date newEndTime = event.getNewEndTime();
+					CalEventEditor editableEvent = (CalEventEditor) calendarEvent;
+					setDates(editableEvent, newStartTime, newEndTime);
+					System.out.println("EventMoveHandler: " + editableEvent.toString());
+					calendarComponent.addEvent((BasicCalendarEvent) editableEvent);
+				}
+			}
+
+			protected void setDates(CalEventEditor event, Date start, Date end) {
+				event.setStart(start);
+				event.setEnd(end);
 			}
 		});
 	}
@@ -454,7 +505,7 @@ public class MainComponent extends CustomComponent {
 		showEventPopup(createNewEvent(start, end), true);
 	}
 
-	private CalendarEvent createNewEvent(Date startDate, Date endDate) {
+	private CalEvent createNewEvent(Date startDate, Date endDate) {
 		BasicCalendarEvent event = new BasicCalendarEvent();
 		event.setCaption("");
 		event.setStart(startDate);
@@ -484,7 +535,9 @@ public class MainComponent extends CustomComponent {
 	private void updateCalendarEventForm(CalendarEvent event) {
 		// Lets create a CalendarEvent BeanItem and pass it to the form's data
 		// source.
-		BeanItem<CalendarEvent> item = new BeanItem<CalendarEvent>(event);
+		System.out.println("updateCalendarEventForm: " + ((BasicCalendarEvent) event).toString());
+
+		BeanItem<CalEvent> item = new BeanItem<CalEvent>((CalEvent) event);
 		scheduleEventForm.setWriteThrough(false);
 		scheduleEventForm.setItemDataSource(item);
 		scheduleEventForm.setFormFieldFactory(new FormFieldFactory() {
@@ -495,6 +548,8 @@ public class MainComponent extends CustomComponent {
 			public Field createField(Item item, Object propertyId, Component uiContext) {
 				if (propertyId.equals("caption")) {
 					TextField f = createTextField("Caption");
+					f.setRequired(true);
+					f.setRequiredError("Caption is missing");
 					f.focus();
 					return f;
 
@@ -675,17 +730,15 @@ public class MainComponent extends CustomComponent {
 	private void commitCalendarEvent() {
 		scheduleEventForm.commit();
 		BasicCalendarEvent event = getFormCalendarEvent();
-		if (!calendarComponent.containsEvent(event)) {
-			calendarComponent.addEvent(event);
-		}
+		calendarComponent.addEvent(event);
 		getMainWindow().removeWindow(scheduleEventPopup);
 	}
 
 	@SuppressWarnings("unchecked")
 	private BasicCalendarEvent getFormCalendarEvent() {
-		BeanItem<CalendarEvent> item = (BeanItem<CalendarEvent>) scheduleEventForm
-				.getItemDataSource();
-		CalendarEvent event = item.getBean();
+		BeanItem<CalEvent> item = (BeanItem<CalEvent>) scheduleEventForm.getItemDataSource();
+		CalEvent event = item.getBean();
+		System.out.println("getFormCalendarEvent: " + ((BasicCalendarEvent) event).toString());
 		return (BasicCalendarEvent) event;
 	}
 
@@ -733,7 +786,7 @@ public class MainComponent extends CustomComponent {
 	protected void updateLab(Object value) {
 		if (value != null) {
 			System.out.println("updateLab: " + (String) value);
-			calendarComponent.swithToLab((String)value);
+			calendarComponent.swithToLab((String) value);
 		}
 
 	}

@@ -5,6 +5,9 @@ import com.vaadin.ui.Window;
 
 /**
  * The Application's "main" class
+ * 1) save button - save settings in the cookie
+ * 2) layout - correct spacing between buttons
+ * 3) bug with 'current week'
  */
 @SuppressWarnings("serial")
 public class CalApplication extends Application

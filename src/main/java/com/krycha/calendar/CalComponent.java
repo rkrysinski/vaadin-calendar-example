@@ -28,19 +28,29 @@ public class CalComponent extends Calendar {
 	}
 
 	public void addEvent(BasicCalendarEvent event) {
-		eventProvider.addEvent(event);
-		event.setCalendarId(eventProvider);
+		if (!eventProvider.containsEvent(event)) {
+			//add
+			System.out.println("adding new event");
+			event.setCalendarId(eventProvider);
+			eventProvider.addEvent(event);
+		}
 		EMF.store(eventProvider);
+		System.out.println("addEvent: " + ((BasicCalendarEvent) event).toString());
+		swithToLab(eventProvider.getDescription());
 	}
 
 	public void removeEvent(BasicCalendarEvent event) {
-		eventProvider.removeEvent(event);
 		event.setCalendarId(eventProvider);
+		eventProvider.removeEvent(event);
 		EMF.store(eventProvider);
+		System.out.println("removeEvent: " + ((BasicCalendarEvent) event).toString());
+		swithToLab(eventProvider.getDescription());
 	}
 
 	public boolean containsEvent(BasicCalendarEvent event) {
-		return eventProvider.containsEvent(event);
+		boolean retVal = eventProvider.containsEvent(event);
+		System.out.println("containsEvent: " + retVal);
+		return retVal;
 	}
 
 	public void init(Locale locale) {
@@ -174,7 +184,7 @@ public class CalComponent extends Calendar {
 		eventProvider = EMF.find(CalEventProvider.class, value);
 		System.out.println("eventProvider size: " + eventProvider.getEventList().size());
 		for (BasicCalendarEvent event : eventProvider.getEventList()) {
-			System.out.println("event: " + event.getDescription());
+			System.out.println("event: " + event.getId() + " -> " + event.getCaption());
 		}
 		setEventProvider(eventProvider);
 		eventProvider.eventChange(null);

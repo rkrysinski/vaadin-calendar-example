@@ -10,11 +10,29 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import com.krycha.calendar.CalEventEditor;
 import com.vaadin.addon.calendar.event.CalendarEvent.EventChangeNotifier;
-import com.vaadin.addon.calendar.event.CalendarEventEditor;
 
 @Entity
-public class BasicCalendarEvent extends DbPojo implements CalendarEventEditor, EventChangeNotifier {
+public class BasicCalendarEvent extends DbPojo implements CalEventEditor, EventChangeNotifier {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer str = new StringBuffer();
+		str.append("Id: ").append(id).append(" caption: \"").append(caption)
+				.append("\" description: \"").append(description).append("\" ").append(" start: ")
+				.append(start).append(" end: ").append(end);
+
+		if (calendarId != null) {
+			str.append(" lab: \"").append(calendarId.getDescription()).append("\"");
+		}
+		return str.toString();
+	}
 
 	private String caption;
 	private String description;
