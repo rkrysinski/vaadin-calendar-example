@@ -9,10 +9,8 @@ import com.vaadin.ui.Window;
 
 /**
  * The Application's "main" class 
- * 2) layout - correct spacing between buttons 
  * 3) error handling 
  * 5) axax push of newly added items to the calendar
- * calendar?lab=delta
  */
 @SuppressWarnings("serial")
 public class CalApplication extends Application implements HttpServletRequestListener {
