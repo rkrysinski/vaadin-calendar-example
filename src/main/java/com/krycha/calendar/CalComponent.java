@@ -182,6 +182,9 @@ public class CalComponent extends Calendar {
 
 	public void swithToLab(String value) {
 		eventProvider = EMF.find(CalEventProvider.class, value);
+		if (eventProvider == null) {
+			return;
+		}
 		System.out.println("eventProvider size: " + eventProvider.getEventList().size());
 		for (BasicCalendarEvent event : eventProvider.getEventList()) {
 			System.out.println("event: " + event.getId() + " -> " + event.getCaption());

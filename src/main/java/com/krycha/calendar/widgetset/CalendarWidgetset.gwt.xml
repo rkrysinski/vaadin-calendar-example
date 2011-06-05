@@ -20,4 +20,6 @@
     <set-property name="user.agent" value="safari"/>
 
     <inherits name="com.vaadin.addon.calendar.gwt.CalendarWidgetset" />
+
+    
 </module>

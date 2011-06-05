@@ -1,5 +1,10 @@
 @import url(../reindeer/styles.css);
 
+.v-calendar .v-gridlayout .v-gridlayout-spacing-on {
+	padding-top: 30px;
+	padding-left: 500px;
+}
+
 .v-app {
 	background: #fff;
 }
