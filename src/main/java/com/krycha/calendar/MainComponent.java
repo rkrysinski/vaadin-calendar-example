@@ -160,7 +160,8 @@ public class MainComponent extends CustomComponent {
 	 * test application.
 	 */
 	private Mode viewMode = Mode.WEEK;
-	private static Location DEFAULT_LOC = Location.COLUMBUS;
+	private Location DEFAULT_LOC = Location.COLUMBUS;
+	private String uriLab = null;
 	private Window scheduleEventPopup = null;
 	private final Form scheduleEventForm = new Form();
 	private Button applyEventButton;
@@ -840,7 +841,9 @@ public class MainComponent extends CustomComponent {
 
 		if (list.size() != 0) {
 			String value = list.iterator().next().getDescription();
-			if (labCookie != null && EMF.find(CalEventProvider.class, labCookie) != null) {
+			if (uriLab != null && EMF.find(CalEventProvider.class, uriLab) != null) {
+				value = uriLab;
+			} else if (labCookie != null && EMF.find(CalEventProvider.class, labCookie) != null) {
 				value = labCookie;
 			}
 			labBox.select(value);
@@ -1025,12 +1028,12 @@ public class MainComponent extends CustomComponent {
 	public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
 		// System.out.println("onRequestStart: start");
 		this.response = response;
-		String labUri = request.getParameter("lab");
-		if (labUri != null) {
-			if (labBox.getValue() != labUri) {
+		uriLab = request.getParameter("lab");
+		if (uriLab != null) {
+			if (labBox.getValue() != uriLab) {
 				// System.out.println("lab -> " + labUri);
-				labBox.select(labUri);
-				updateLab(labUri);
+				labBox.select(uriLab);
+				updateLab(uriLab);
 			}
 		}
 	}
