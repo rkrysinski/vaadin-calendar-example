@@ -30,12 +30,12 @@ public class CalComponent extends Calendar {
 	public void addEvent(BasicCalendarEvent event) {
 		if (!eventProvider.containsEvent(event)) {
 			//add
-			System.out.println("adding new event");
+			// System.out.println("adding new event");
 			event.setCalendarId(eventProvider);
 			eventProvider.addEvent(event);
 		}
 		EMF.store(eventProvider);
-		System.out.println("addEvent: " + ((BasicCalendarEvent) event).toString());
+		// System.out.println("addEvent: " + ((BasicCalendarEvent) event).toString());
 		swithToLab(eventProvider.getDescription());
 	}
 
@@ -43,13 +43,13 @@ public class CalComponent extends Calendar {
 		event.setCalendarId(eventProvider);
 		eventProvider.removeEvent(event);
 		EMF.store(eventProvider);
-		System.out.println("removeEvent: " + ((BasicCalendarEvent) event).toString());
+		// System.out.println("removeEvent: " + ((BasicCalendarEvent) event).toString());
 		swithToLab(eventProvider.getDescription());
 	}
 
 	public boolean containsEvent(BasicCalendarEvent event) {
 		boolean retVal = eventProvider.containsEvent(event);
-		System.out.println("containsEvent: " + retVal);
+		// System.out.println("containsEvent: " + retVal);
 		return retVal;
 	}
 
@@ -139,13 +139,13 @@ public class CalComponent extends Calendar {
 	private void doSetStartDate() {
 		skaleToMin();
 		setStartDate(calendar.getTime());
-		System.out.println("setStartDate: " + calendar.getTime());
+		// System.out.println("setStartDate: " + calendar.getTime());
 	}
 
 	private void doSetEndDate() {
 		skaleToMax();
 		setEndDate(calendar.getTime());
-		System.out.println("doSetEndDate: " + calendar.getTime());
+		// System.out.println("doSetEndDate: " + calendar.getTime());
 	}
 
 	/*
@@ -185,10 +185,10 @@ public class CalComponent extends Calendar {
 		if (eventProvider == null) {
 			return;
 		}
-		System.out.println("eventProvider size: " + eventProvider.getEventList().size());
-		for (BasicCalendarEvent event : eventProvider.getEventList()) {
-			System.out.println("event: " + event.getId() + " -> " + event.getCaption());
-		}
+		// System.out.println("eventProvider size: " + eventProvider.getEventList().size());
+		//for (BasicCalendarEvent event : eventProvider.getEventList()) {
+			// System.out.println("event: " + event.getId() + " -> " + event.getCaption());
+		//}
 		setEventProvider(eventProvider);
 		eventProvider.eventChange(null);
 	}

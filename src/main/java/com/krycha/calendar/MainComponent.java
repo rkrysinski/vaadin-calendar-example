@@ -188,15 +188,17 @@ public class MainComponent extends CustomComponent {
 		Location locCookie = null;
 		String labCookie = null;
 		Cookie[] cookies = request.getCookies();
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals(LOC_COOKIE)) {
-				locCookie = Location.getByName(cookies[i].getValue());
-			} else if (cookies[i].getName().equals(LAB_COOKIE)) {
-				labCookie = cookies[i].getValue();
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals(LOC_COOKIE)) {
+					locCookie = Location.getByName(cookies[i].getValue());
+				} else if (cookies[i].getName().equals(LAB_COOKIE)) {
+					labCookie = cookies[i].getValue();
+				}
 			}
 		}
 		if (locCookie != null) {
-			DEFAULT_LOC = locCookie; 
+			DEFAULT_LOC = locCookie;
 		}
 		setLocale(DEFAULT_LOC.getLocale());
 		initializeCalendar();
@@ -217,12 +219,12 @@ public class MainComponent extends CustomComponent {
 			cookie.setMaxAge(1296000); // 30 days
 			if (response != null) {
 				response.addCookie(cookie);
-				System.out.println("saveCookie: " + cookieKey + " cookie saved: " + cookieVal);
+				// System.out.println("saveCookie: " + cookieKey + " cookie saved: " + cookieVal);
 			} else {
-				System.out.println("Cookie not set (response == null)");
+				// System.out.println("Cookie not set (response == null)");
 			}
 		} else {
-			System.out.println("saveCookie: " + cookieKey + " no value to save");
+			// System.out.println("saveCookie: " + cookieKey + " no value to save");
 		}
 	}
 
@@ -352,7 +354,7 @@ public class MainComponent extends CustomComponent {
 		if (value != null) {
 			EMF.remove(CalEventProvider.class, value);
 		} else {
-			System.out.println("dbRemoveLab");
+			// System.out.println("dbRemoveLab");
 		}
 
 	}
@@ -518,10 +520,10 @@ public class MainComponent extends CustomComponent {
 					long length = editableEvent.getEnd().getTime()
 							- editableEvent.getStart().getTime();
 					setDates(editableEvent, newFromTime, new Date(newFromTime.getTime() + length));
-					System.out.println("EventMoveHandler: " + editableEvent.toString());
+					// System.out.println("EventMoveHandler: " + editableEvent.toString());
 					calendarComponent.addEvent((BasicCalendarEvent) editableEvent);
 				} else {
-					System.out.println("something wrong...");
+					// System.out.println("something wrong...");
 				}
 			}
 
@@ -540,7 +542,7 @@ public class MainComponent extends CustomComponent {
 					Date newEndTime = event.getNewEndTime();
 					CalEventEditor editableEvent = (CalEventEditor) calendarEvent;
 					setDates(editableEvent, newStartTime, newEndTime);
-					System.out.println("EventMoveHandler: " + editableEvent.toString());
+					// System.out.println("EventMoveHandler: " + editableEvent.toString());
 					calendarComponent.addEvent((BasicCalendarEvent) editableEvent);
 				}
 			}
@@ -597,7 +599,7 @@ public class MainComponent extends CustomComponent {
 	private void updateCalendarEventForm(CalendarEvent event) {
 		// Lets create a CalendarEvent BeanItem and pass it to the form's data
 		// source.
-		System.out.println("updateCalendarEventForm: " + ((BasicCalendarEvent) event).toString());
+		// System.out.println("updateCalendarEventForm: " + ((BasicCalendarEvent) event).toString());
 
 		BeanItem<CalEvent> item = new BeanItem<CalEvent>((CalEvent) event);
 		scheduleEventForm.setWriteThrough(false);
@@ -611,7 +613,9 @@ public class MainComponent extends CustomComponent {
 				if (propertyId.equals("caption")) {
 					TextField f = createTextField("Caption");
 					f.setRequired(true);
+					f.setWidth("80%");
 					f.setRequiredError("Caption is missing");
+					f.setInputPrompt("Caption and/or event owner...");
 					f.focus();
 					return f;
 
@@ -620,7 +624,9 @@ public class MainComponent extends CustomComponent {
 
 				} else if (propertyId.equals("description")) {
 					TextField f = createTextField("Description");
-					f.setRows(3);
+					f.setRows(4);
+					f.setWidth("80%");
+					f.setInputPrompt("Provide info on what you will be doing...");
 					return f;
 
 				} else if (propertyId.equals("styleName")) {
@@ -676,13 +682,14 @@ public class MainComponent extends CustomComponent {
 			private Select createStyleNameSelect() {
 				Select s = new Select("Color");
 				s.addContainerProperty("c", String.class, "");
+				s.setWidth("70%");
 				s.setItemCaptionPropertyId("c");
 				Item i = s.addItem("color1");
-				i.getItemProperty("c").setValue("Green");
+				i.getItemProperty("c").setValue("Green - lab can be shared");
 				i = s.addItem("color2");
-				i.getItemProperty("c").setValue("Blue");
+				i.getItemProperty("c").setValue("Blue - ask event owner");
 				i = s.addItem("color3");
-				i.getItemProperty("c").setValue("Red");
+				i.getItemProperty("c").setValue("Red - do not disturb");
 				i = s.addItem("color4");
 				i.getItemProperty("c").setValue("Orange");
 				return s;
@@ -800,7 +807,7 @@ public class MainComponent extends CustomComponent {
 	private BasicCalendarEvent getFormCalendarEvent() {
 		BeanItem<CalEvent> item = (BeanItem<CalEvent>) scheduleEventForm.getItemDataSource();
 		CalEvent event = item.getBean();
-		System.out.println("getFormCalendarEvent: " + ((BasicCalendarEvent) event).toString());
+		// System.out.println("getFormCalendarEvent: " + ((BasicCalendarEvent) event).toString());
 		return (BasicCalendarEvent) event;
 	}
 
@@ -851,7 +858,7 @@ public class MainComponent extends CustomComponent {
 
 	protected void updateLab(String value) {
 		if (value != null) {
-			System.out.println("updateLab: " + (String) value);
+			// System.out.println("updateLab: " + (String) value);
 			calendarComponent.swithToLab((String) value);
 		}
 
@@ -888,9 +895,9 @@ public class MainComponent extends CustomComponent {
 			return;
 		}
 		Location loc = (Location) value;
-		System.out.println("Timezone: " + loc.getTimezone());
+		// System.out.println("Timezone: " + loc.getTimezone());
 		timezoneBox.select(loc.getTimezone());
-		System.out.println("Location: " + loc.getLocation());
+		// System.out.println("Location: " + loc.getLocation());
 		localeBox.select(loc.getLocale());
 		updateCalendarTimeZone(loc.getTimezone());
 		updateCalendarLocale(loc.getLocale());
@@ -1016,12 +1023,12 @@ public class MainComponent extends CustomComponent {
 	}
 
 	public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("onRequestStart: start");
+		// System.out.println("onRequestStart: start");
 		this.response = response;
 		String labUri = request.getParameter("lab");
 		if (labUri != null) {
 			if (labBox.getValue() != labUri) {
-				System.out.println("lab -> " + labUri);
+				// System.out.println("lab -> " + labUri);
 				labBox.select(labUri);
 				updateLab(labUri);
 			}
@@ -1036,16 +1043,16 @@ public class MainComponent extends CustomComponent {
 		mainLayout.setWidth("100%");
 		mainLayout.setHeight("100%");
 		mainLayout.setMargin(false);
-		
+
 		// top-level component properties
 		setWidth("100.0%");
 		setHeight("100.0%");
-		
+
 		// contentVerticalLayout
 		contentVerticalLayout = buildContentVerticalLayout();
 		mainLayout.addComponent(contentVerticalLayout,
 				"top:0.0px;right:0.0px;bottom:0.0px;left:0.0px;");
-		
+
 		return mainLayout;
 	}
 
@@ -1057,15 +1064,15 @@ public class MainComponent extends CustomComponent {
 		contentVerticalLayout.setWidth("100.0%");
 		contentVerticalLayout.setHeight("100.0%");
 		contentVerticalLayout.setMargin(false);
-		
+
 		// gridLayout_1
 		gridLayout_1 = buildGridLayout_1();
 		contentVerticalLayout.addComponent(gridLayout_1);
-		
+
 		// navigationBench
 		navigationBench = buildNavigationBench();
 		contentVerticalLayout.addComponent(navigationBench);
-		
+
 		// calendarComponent
 		calendarComponent = new CalComponent();
 		calendarComponent.setImmediate(false);
@@ -1073,7 +1080,7 @@ public class MainComponent extends CustomComponent {
 		calendarComponent.setHeight("100.0%");
 		contentVerticalLayout.addComponent(calendarComponent);
 		contentVerticalLayout.setExpandRatio(calendarComponent, 1.0f);
-		
+
 		return contentVerticalLayout;
 	}
 
@@ -1089,7 +1096,7 @@ public class MainComponent extends CustomComponent {
 		gridLayout_1.setSpacing(true);
 		gridLayout_1.setColumns(7);
 		gridLayout_1.setRows(2);
-		
+
 		// locationLabel
 		locationLabel = new Label();
 		locationLabel.setImmediate(false);
@@ -1098,7 +1105,7 @@ public class MainComponent extends CustomComponent {
 		locationLabel.setValue("Location:");
 		gridLayout_1.addComponent(locationLabel, 0, 0);
 		gridLayout_1.setComponentAlignment(locationLabel, new Alignment(34));
-		
+
 		// locationBox
 		locationBox = new ComboBox();
 		locationBox.setImmediate(false);
@@ -1106,7 +1113,7 @@ public class MainComponent extends CustomComponent {
 		locationBox.setHeight("-1px");
 		gridLayout_1.addComponent(locationBox, 1, 0);
 		gridLayout_1.setComponentAlignment(locationBox, new Alignment(33));
-		
+
 		// timezoneLabel
 		timezoneLabel = new Label();
 		timezoneLabel.setImmediate(false);
@@ -1115,7 +1122,7 @@ public class MainComponent extends CustomComponent {
 		timezoneLabel.setValue("  Timezone:");
 		gridLayout_1.addComponent(timezoneLabel, 2, 0);
 		gridLayout_1.setComponentAlignment(timezoneLabel, new Alignment(34));
-		
+
 		// timezoneBox
 		timezoneBox = new ComboBox();
 		timezoneBox.setImmediate(false);
@@ -1123,7 +1130,7 @@ public class MainComponent extends CustomComponent {
 		timezoneBox.setHeight("-1px");
 		gridLayout_1.addComponent(timezoneBox, 3, 0);
 		gridLayout_1.setComponentAlignment(timezoneBox, new Alignment(33));
-		
+
 		// localeLabel
 		localeLabel = new Label();
 		localeLabel.setImmediate(false);
@@ -1132,7 +1139,7 @@ public class MainComponent extends CustomComponent {
 		localeLabel.setValue("Locale:");
 		gridLayout_1.addComponent(localeLabel, 4, 0);
 		gridLayout_1.setComponentAlignment(localeLabel, new Alignment(34));
-		
+
 		// localeBox
 		localeBox = new ComboBox();
 		localeBox.setImmediate(false);
@@ -1140,7 +1147,7 @@ public class MainComponent extends CustomComponent {
 		localeBox.setHeight("-1px");
 		gridLayout_1.addComponent(localeBox, 5, 0);
 		gridLayout_1.setComponentAlignment(localeBox, new Alignment(33));
-		
+
 		// saveButton
 		saveButton = new Button();
 		saveButton.setCaption("Save");
@@ -1149,7 +1156,7 @@ public class MainComponent extends CustomComponent {
 		saveButton.setHeight("-1px");
 		gridLayout_1.addComponent(saveButton, 6, 0);
 		gridLayout_1.setComponentAlignment(saveButton, new Alignment(48));
-		
+
 		// labLabel
 		labLabel = new Label();
 		labLabel.setImmediate(false);
@@ -1158,7 +1165,7 @@ public class MainComponent extends CustomComponent {
 		labLabel.setValue("Lab:");
 		gridLayout_1.addComponent(labLabel, 0, 1);
 		gridLayout_1.setComponentAlignment(labLabel, new Alignment(34));
-		
+
 		// labBox
 		labBox = new ComboBox();
 		labBox.setImmediate(false);
@@ -1166,12 +1173,12 @@ public class MainComponent extends CustomComponent {
 		labBox.setHeight("-1px");
 		gridLayout_1.addComponent(labBox, 1, 1);
 		gridLayout_1.setComponentAlignment(labBox, new Alignment(33));
-		
+
 		// labButtons
 		labButtons = buildLabButtons();
 		gridLayout_1.addComponent(labButtons, 2, 1);
 		gridLayout_1.setComponentAlignment(labButtons, new Alignment(33));
-		
+
 		// addLabInput
 		addLabInput = new TextField();
 		addLabInput.setImmediate(false);
@@ -1180,7 +1187,7 @@ public class MainComponent extends CustomComponent {
 		addLabInput.setSecret(false);
 		gridLayout_1.addComponent(addLabInput, 3, 1);
 		gridLayout_1.setComponentAlignment(addLabInput, new Alignment(33));
-		
+
 		return gridLayout_1;
 	}
 
@@ -1192,7 +1199,7 @@ public class MainComponent extends CustomComponent {
 		labButtons.setWidth("-1px");
 		labButtons.setHeight("-1px");
 		labButtons.setMargin(false);
-		
+
 		// removeLabButton
 		removeLabButton = new Button();
 		removeLabButton.setCaption("-");
@@ -1202,7 +1209,7 @@ public class MainComponent extends CustomComponent {
 		removeLabButton.setHeight("-1px");
 		labButtons.addComponent(removeLabButton);
 		labButtons.setComponentAlignment(removeLabButton, new Alignment(33));
-		
+
 		// addLabButton
 		addLabButton = new Button();
 		addLabButton.setCaption("+");
@@ -1212,7 +1219,7 @@ public class MainComponent extends CustomComponent {
 		addLabButton.setHeight("-1px");
 		labButtons.addComponent(addLabButton);
 		labButtons.setComponentAlignment(addLabButton, new Alignment(34));
-		
+
 		return labButtons;
 	}
 
@@ -1224,7 +1231,7 @@ public class MainComponent extends CustomComponent {
 		navigationBench.setWidth("100.0%");
 		navigationBench.setHeight("-1px");
 		navigationBench.setMargin(false);
-		
+
 		// prevButton
 		prevButton = new Button();
 		prevButton.setCaption("Prev");
@@ -1233,7 +1240,7 @@ public class MainComponent extends CustomComponent {
 		prevButton.setHeight("-1px");
 		navigationBench.addComponent(prevButton);
 		navigationBench.setComponentAlignment(prevButton, new Alignment(33));
-		
+
 		// monthLabel
 		monthLabel = new Label();
 		monthLabel.setImmediate(false);
@@ -1242,7 +1249,7 @@ public class MainComponent extends CustomComponent {
 		monthLabel.setValue("Month");
 		navigationBench.addComponent(monthLabel);
 		navigationBench.setComponentAlignment(monthLabel, new Alignment(33));
-		
+
 		// monthViewButton
 		monthViewButton = new Button();
 		monthViewButton.setCaption("Current month view");
@@ -1251,7 +1258,7 @@ public class MainComponent extends CustomComponent {
 		monthViewButton.setHeight("-1px");
 		navigationBench.addComponent(monthViewButton);
 		navigationBench.setComponentAlignment(monthViewButton, new Alignment(33));
-		
+
 		// addEventButton
 		addEventButton = new Button();
 		addEventButton.setCaption("Add new event");
@@ -1260,7 +1267,7 @@ public class MainComponent extends CustomComponent {
 		addEventButton.setHeight("-1px");
 		navigationBench.addComponent(addEventButton);
 		navigationBench.setComponentAlignment(addEventButton, new Alignment(33));
-		
+
 		// nextButton
 		nextButton = new Button();
 		nextButton.setCaption("Next");
@@ -1269,7 +1276,7 @@ public class MainComponent extends CustomComponent {
 		nextButton.setHeight("-1px");
 		navigationBench.addComponent(nextButton);
 		navigationBench.setComponentAlignment(nextButton, new Alignment(34));
-		
+
 		return navigationBench;
 	}
 }
